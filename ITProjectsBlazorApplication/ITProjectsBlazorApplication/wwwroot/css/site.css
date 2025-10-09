@@ -1,0 +1,149 @@
+@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
+
+html, body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 16px;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.valid.modified:not([type=checkbox]) {
+    outline: 1px solid #26b050;
+}
+
+.invalid {
+    outline: 1px solid red;
+}
+
+.validation-message {
+    color: red;
+}
+
+.button-link {
+    text-decoration: unset;
+}
+
+#blazor-error-ui {
+    background: lightyellow;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+}
+
+.title {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-bottom: 0.625rem;
+}
+
+.title.title-secondary {
+    padding-top: 0.313rem;
+    padding-bottom: 0;
+    color: var(--bs-secondary-color);
+}
+
+.title-header-text {
+    font-size: 2.5rem;
+    line-height: 3rem;
+    font-weight: 600;
+    letter-spacing: 0rem;
+    padding: 0.3125rem 0;
+}
+
+.title-content-text {
+    font-size: 1.75rem;
+    font-weight: 400;
+    line-height: 2.5rem;
+    letter-spacing: 0rem;
+}
+
+.main-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+
+.block-content {
+    width: 31.25rem;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    max-width: 100%;
+}
+/* DevExpress and Bootstrap Themes */
+.alt-item > td:not(.dxbl-grid-empty-cell),
+.alt-item > td:not(.dxbl-grid-indent-cell)
+{
+    background-color: #FFE4C4;
+    color: #161616;
+}
+::deep .table-sm,
+::deep .table-sm td,
+::deep .table-sm th {
+    font-size: .3rem;
+}
+
+.msg-text {
+    white-space: pre-wrap;
+}
+.grid-size {
+    width: 100%;
+    height: 750px;
+}
+.alt-item {
+    --dxbl-grid-row-bg: var(--DS-color-surface-neutral-subdued-rest);
+}
+.alt-item > td {
+    --dxbl-grid-row-bg: var(--DS-color-surface-neutral-subdued-rest);
+}
+.status-no-issues {
+    background-color: green;
+    /*font-weight: bold;*/
+    color: white;
+}
+.status-critical-issues {
+    background-color: red;
+    /*font-weight: bold;*/
+    color: white;
+}
+.status-completed {
+    background-color: black;
+    /*font-weight: bold;*/
+    color: white;
+}
+.status-delays {
+    background-color: yellow;
+    /*font-weight: bold;*/
+    color: black;
+}
+.status-on-hold {
+    background-color: blue;
+    /*    font-weight: bold;*/
+    color: white;
+}
+.status-cancelled {
+    background-color: purple;
+    /*font-weight: bold;*/
+    color: white;
+}

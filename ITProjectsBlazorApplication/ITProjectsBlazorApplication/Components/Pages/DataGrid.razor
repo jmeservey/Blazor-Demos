@@ -1,0 +1,257 @@
+﻿@using DevExpress.Blazor;
+@using RazorClassLibrary;
+@page "/datagrid"
+@rendermode InteractiveServer
+
+<PageTitle>Projects</PageTitle>
+
+<h3>Projects</h3>
+
+<div class="grid-container">
+
+<DxGrid 
+    Data="@Data" 
+    EditMode="GridEditMode.EditRow" 
+    ShowAllRows="true" 
+    TextWrapEnabled="false"    
+    ShowGroupPanel="true" 
+    PagerAutoHideNavButtons="false" 
+    PageSizeSelectorVisible="true" 
+    SizeMode="SizeMode.Small" 
+    HighlightRowOnHover="true"
+    FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Never"
+    EditModelSaving="Grid_EditModelSaving"
+    DataItemDeleting="Grid_DataItemDeleting"
+    EditNewRowPosition="GridEditNewRowPosition.FixedOnTop"
+    CustomizeElement="Grid_CustomizeElement"
+    CssClass="grid-size">
+
+    <Columns>
+        <DxGridCommandColumn Width="125px" FixedPosition="GridColumnFixedPosition.Left"/>
+        <DxGridDataColumn FieldName="ID" Caption="Project #" TextAlignment="GridTextAlignment.Center" Width="60px" />
+        <DxGridDataColumn Name="StatusCol" FieldName="Status" TextAlignment="GridTextAlignment.Center" Width="80px">
+            <EditSettings>
+                <DxComboBoxSettings Data="StatusOptions" />
+            </EditSettings>
+        </DxGridDataColumn>
+        <DxGridDataColumn FieldName="DepartmentPriority" TextAlignment="GridTextAlignment.Center" Caption="Dept. Priority" Width="75px">
+            <EditSettings>
+                <DxComboBoxSettings Data="DepartmentPriorityOptions" />
+            </EditSettings>
+        </DxGridDataColumn>
+        <DxGridDataColumn FieldName="ProjectType" Caption="Project Type *" Width="120px">
+            <EditSettings>
+                <DxComboBoxSettings Data="ProjectTypeOptions" />
+            </EditSettings>
+        </DxGridDataColumn>
+        <DxGridDataColumn FieldName="Project" FixedPosition="GridColumnFixedPosition.Left" Caption="Project Name" Width="200px" />
+        <DxGridDataColumn FieldName="ProjectOwner" Caption="Project Owner *" Width="130px">
+            <EditSettings>
+                <DxComboBoxSettings Data="ITStaffOptions" />
+            </EditSettings>
+        </DxGridDataColumn>
+        <DxGridDataColumn FieldName="PrincipalIT" Caption="Principal IT" Width="130px">
+            <EditSettings>
+                <DxComboBoxSettings Data="ITStaffOptions" />
+            </EditSettings>
+        </DxGridDataColumn>        
+        <DxGridDataColumn FieldName="Site" Caption="EPlant *" Width="70px">
+            <EditSettings>
+                <DxComboBoxSettings Data="EPlantOptions" />
+            </EditSettings>
+        </DxGridDataColumn>
+        <DxGridDataColumn FieldName="Department" Caption="Department *" Width="150px">
+            <EditSettings>
+                <DxComboBoxSettings Data="DepartmentOptions" />
+            </EditSettings>
+        </DxGridDataColumn>
+        <DxGridDataColumn FieldName="BusinessOwner" Caption="Business Owner *" Width="150px"/>
+        <DxGridDataColumn FieldName="StartDate" Caption="Start Date *" TextAlignment="GridTextAlignment.Center" Width="75px" />
+        <DxGridDataColumn FieldName="ProjectedEndDate" Caption="Project End Date *" TextAlignment="GridTextAlignment.Center" Width="75px" />
+        <DxGridDataColumn FieldName="ProjectStage" Caption="Project Stage *" Width="85px">
+            <EditSettings>
+                <DxComboBoxSettings Data="ProjectStageOptions" />
+                </EditSettings>
+        </DxGridDataColumn>       
+        <DxGridDataColumn FieldName="Department" Width="100px"/>
+        <DxGridDataColumn FieldName="BusinessOwner" Width="150px" />
+        <DxGridDataColumn FieldName="TicketNumber" DisplayFormat="{0:g}" TextAlignment="GridTextAlignment.Center" Width="50px">
+            <CellDisplayTemplate>
+                @* Custom display for TicketNumber to show a link if it is not empty *@
+                @{
+                    var value = ((ProjectModel)context.DataItem).TicketNumber.ToString();
+                    if (!string.IsNullOrEmpty(value))
+                    {
+                        if (value == "0")
+                        {
+                            <span></span>
+                        }
+                        else
+                        {
+                            <a href="https://smchelpdesk.freshservice.com/a/tickets/@value" target="_blank">@value</a>
+                        }
+                    }
+                    else
+                    {
+                        <span></span>
+                    }
+                }
+            </CellDisplayTemplate>
+        </DxGridDataColumn>
+        <DxGridDataColumn FieldName="StartDate" DisplayFormat="d" TextAlignment="GridTextAlignment.Center" Width="75px" />
+        <DxGridDataColumn FieldName="ProjectedEndDate" DisplayFormat="d" TextAlignment="GridTextAlignment.Center" Width="75px" />
+        <DxGridDataColumn FieldName="Stakeholders" Width="75px" />
+        <DxGridDataColumn FieldName="Scope" Width="150px" />
+        <DxGridDataColumn FieldName="ProjectStage" Width="75px" />
+        <DxGridDataColumn FieldName="PercentComplete" DisplayFormat="p0" TextAlignment="GridTextAlignment.Center" Width="75px">
+            <EditSettings>
+                <DxComboBoxSettings Data="PercentCompleteOptions" />
+                </EditSettings>
+        </DxGridDataColumn>
+        <DxGridDataColumn FieldName="ProjectROI" DisplayFormat="c0" TextAlignment="GridTextAlignment.Center" Width="75px" />
+        <DxGridDataColumn FieldName="Notes" Width="150px">
+                <CellDisplayTemplate>
+                    @* Custom display for Notes to show a link if it is not empty *@
+                    @{
+                        var value = ((ProjectModel)context.DataItem).Notes.ToString();
+                        if (!string.IsNullOrEmpty(value))
+                        {
+                            <a class="d-block text-left" href="javascript:;" @onclick="() => ShowNote(context)">Show Note...</a>
+                        }
+                        else
+                        {
+                            <span></span>
+                        }
+                    }
+                </CellDisplayTemplate>
+             <EditSettings>
+                <DxMemoSettings Rows="3"  ResizeMode="MemoResizeMode.VerticalAndHorizontal"/>
+            </EditSettings> 
+        </DxGridDataColumn>
+    </Columns>
+</DxGrid>
+<DxPopup @bind-Visible="@PopupVisible"
+         HeaderText="@PopupHeaderText"
+         HorizontalAlignment="HorizontalAlignment.Center"
+         VerticalAlignment="VerticalAlignment.Center">
+         <Content>
+            <p class="msg-text">@PopupContent</p>
+         </Content>
+</DxPopup>
+</div>
+@code {
+    IEnumerable<ProjectModel> Data { get; set; }
+    List<string> StatusOptions = new List<string>() { "No Issues", "On Hold", "Delays", "Critical Issues", "Completed", "Cancelled" };
+    List<string> DepartmentPriorityOptions = new List<string>() { "High", "Medium", "Low" };
+    List<string> ProjectTypeOptions = new List<string>() { "Infrastructure", "Business Solution", "Infrastructure & Business Solution" };
+    List<string> EPlantOptions = new List<string>() { "Amery", "Costa Rica", "Devens", "Drive", "Global", "India", "Santa Rosa", "Ohio", "Woodville" };
+    List<string> DepartmentOptions = new List<string>() { "Accounting/Finance", "Customer Service (SC)", "Engineering", "HR/Legal", "Maintenance", "QA", "Purchasing (SC)", "Shipping/Receiving (SC)", "Tool Room/Automation", "Operations/Production", "IT", "Sales", "Document Control" };
+    List<string> ProjectStageOptions = new List<string>() { "In Queue", "Requirements", "Developments", "User Acceptance Testing", "Implement", "Stabilization", "Closed", "Cancelled", "Waiting on User(s)" };
+    List<string> PercentCompleteOptions = new List<string>() { "0", ".1", ".25", ".5", ".75", ".95", "1" };
+    List<string> ITStaffOptions { get; set; } = new List<string>();
+    ProjectModel CurrentProject { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Data = Database.GetProjects();
+        ApiHelper.InitializeClient();
+        LoadITStaff();
+    }
+    public async void LoadITStaff()
+    {
+        var agentInfo = await AgentProcessor.LoadAgentsInformation();
+        ITStaffOptions.Clear();
+        ITStaffOptions.AddRange(agentInfo.Select(x => x.FullName));
+    }
+    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        var editableProject = (ProjectModel)e.EditModel;
+
+        if (e.IsNew)
+        {
+            Database.CreateProject(editableProject);
+        }
+        else
+        {
+            // TODO: Need either have this work with an update that updates all the data or just one data row at a time.
+            // Database.UpdateProject(editableProject);
+        }
+
+        Data = Database.GetProjects();
+    }
+
+    async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
+    {
+        var projectToDelete = (ProjectModel)e.DataItem;
+        Database.DeleteProject(projectToDelete.ID);
+        Data = Database.GetProjects();
+    }
+
+    void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
+    {
+        if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
+        {
+            e.CssClass = "alt-item";
+        }
+
+        if (e.ElementType == GridElementType.DataCell) // && e.Column.Name == "Status") //&& (System.String)e.Grid.GetRowValue(e.VisibleIndex, "Status") == "No Issues")
+        {
+            if (e.Column.Name == "StatusCol")
+            {
+                switch ((System.String)e.Grid.GetRowValue(e.VisibleIndex, "Status"))
+                {
+                    case "Critical Issues":
+                        e.CssClass = "status-critical-issues";
+                        break;
+                    case "Delays":
+                        e.CssClass = "status-delays";
+                        break;
+                    case "On Hold":
+                        e.CssClass = "status-on-hold";
+                        break;
+                    case "Completed":
+                        e.CssClass = "status-completed";
+                        break;
+                    case "Cancelled":
+                        e.CssClass = "status-cancelled";
+                        break;
+                    case "No Issues":
+                        e.CssClass = "status-no-issues";
+                        break;
+                    default:
+                        //e.CssClass = string.Empty;
+                        break;
+                }
+            }
+        }
+
+        if (e.ElementType == GridElementType.HeaderCell)
+        {
+            e.Style = "background-color: #E6E6E6;";
+            e.CssClass = "header-bold";
+        }
+    }
+    bool PopupVisible
+    {
+        get { return CurrentProject != null; }
+        set {
+            if (!value)
+            {
+                CurrentProject = null;
+            }
+        }
+    }
+    string PopupHeaderText
+    {
+        get { return CurrentProject != null ? $"Notes for {CurrentProject.Project}" : string.Empty; }
+    }
+    string PopupContent
+    {
+        get { return CurrentProject?.Notes ?? string.Empty; }
+    }
+
+    public void ShowNote(GridDataColumnCellDisplayTemplateContext context)
+    {
+        CurrentProject = (ProjectModel)context.DataItem;
+    }
+}
