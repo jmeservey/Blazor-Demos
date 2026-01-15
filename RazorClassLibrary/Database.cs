@@ -16,16 +16,23 @@ namespace RazorClassLibrary
 
         public static void CreateProject(ProjectModel project)
         {
-            using (IDbConnection connection = new SqlConnection(ConnectionString))
+            try
             {
-                string queryString = $"INSERT INTO Projects (Status, DepartmentPriority, Site, ProjectROI, Department, Project, ProjectType, ProjectOwner, PrincipalIT, BusinessOwner, TicketNumber, StartDate, ProjectedEndDate, Stakeholders, Scope, ProjectStage, PercentComplete, Notes, ProjectFolderPath)" +
-                                                   $"VALUES (@Status, @DepartmentPriority, @Site, @ProjectROI, @Department, @Project, @ProjectType, @ProjectOwner, @PrincipalIT, @BusinessOwner, @TicketNumber, @StartDate, @ProjectedEndDate, @Stakeholders, @Scope, @ProjectStage, @PercentComplete, @Notes, @ProjectFolderPath)";
+                using (IDbConnection connection = new SqlConnection(ConnectionString))
+                {
+                    string queryString = $"INSERT INTO Projects (Status, DepartmentPriority, Site, ProjectROI, Department, Project, ProjectType, ProjectOwner, PrincipalIT, BusinessOwner, TicketNumber, StartDate, ProjectedEndDate, Stakeholders, Scope, ProjectStage, PercentComplete, Notes, ProjectFolderPath)" +
+                                         $"VALUES (@Status, @DepartmentPriority, @Site, @ProjectROI, @Department, @Project, @ProjectType, @ProjectOwner, @PrincipalIT, @BusinessOwner, @TicketNumber, @StartDate, @ProjectedEndDate, @Stakeholders, @Scope, @ProjectStage, @PercentComplete, @Notes, @ProjectFolderPath)";
 
-                connection.Open();  // For some reason this is needed in order to obtain the id of the newly created Project in the database.
+                    connection.Open();  // For some reason this is needed in order to obtain the id of the newly created Project in the database.
 
-                connection.Execute(queryString, project);
+                    connection.Execute(queryString, project);
 
-                project.ID = int.Parse(connection.ExecuteScalar("SELECT @@IDENTITY").ToString());
+                    project.ID = int.Parse(connection.ExecuteScalar("SELECT @@IDENTITY").ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
             }
         }
         public static List<ProjectModel> GetSampleProjects()
@@ -64,9 +71,30 @@ namespace RazorClassLibrary
                 connection.Execute(queryString, project);
             }
         }
-        public static void UpdateProject(ProjectModel project, List<string> fields)
+        public static void UpdateProject(ProjectModel project)
         {
             StringBuilder sb = new StringBuilder();
+
+            List<string> fields = new List<string>() { 
+                "Status", 
+                "DepartmentPriority", 
+                "ProjectType", 
+                "Project", 
+                "ProjectOwner",
+                "PrincipalIT", 
+                "Site", 
+                "Department", 
+                "BusinessOwner", 
+                "TicketNumber", 
+                "StartDate", 
+                "ProjectedEndDate",
+                "ProjectStage",
+                "Stakeholders", 
+                "Scope",  
+                "PercentComplete", 
+                "ProjectROI", 
+                "Notes" 
+            };
 
             foreach (var item in fields)
             {

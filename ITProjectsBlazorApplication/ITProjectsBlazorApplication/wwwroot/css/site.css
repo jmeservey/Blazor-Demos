@@ -92,12 +92,12 @@ html, body {
     max-width: 100%;
 }
 /* DevExpress and Bootstrap Themes */
-.alt-item > td:not(.dxbl-grid-empty-cell),
+/*.alt-item > td:not(.dxbl-grid-empty-cell),
 .alt-item > td:not(.dxbl-grid-indent-cell)
 {
     background-color: #FFE4C4;
     color: #161616;
-}
+}*/
 ::deep .table-sm,
 ::deep .table-sm td,
 ::deep .table-sm th {
@@ -107,16 +107,42 @@ html, body {
 .msg-text {
     white-space: pre-wrap;
 }
-.grid-size {
+
+.project-grid {
     width: 100%;
     height: 750px;
 }
-.alt-item {
-    --dxbl-grid-row-bg: var(--DS-color-surface-neutral-subdued-rest);
+
+.dxbl-grid-header-row th {
+    background-color: #FFE4C4;
 }
-.alt-item > td {
-    --dxbl-grid-row-bg: var(--DS-color-surface-neutral-subdued-rest);
+
+.dxbl-grid-header-fixed {
+    background-color: #bfbfbf;
 }
+
+.alt-row {
+    background-color: #FFE4C4;
+/*    color: #161616;
+    --dxbl-grid-row-bg: var(--DS-color-surface-neutral-subdued-rest);*/
+}
+/* Specific rule for fixed cells to inherit the alternating color */
+.dxbl-grid .dxbl-grid-table > tbody > tr.alt-row > td.dxbl-grid-fixed-cell {
+     background-color: #FFE4C4;  /*Ensure fixed cell color matches*/ 
+     /*Alternatively, for modern DevExpress themes:*/ 
+    /*--dxbl-grid-row-bg: var(--DS-color-surface-neutral-subdued-rest);*/
+}
+/*.header-row {
+    background-color: #bfbfbf;
+}*/
+/*.alt-item > td {
+    --dxbl-grid-row-bg: var(--DS-color-surface-neutral-subdued-rest);
+}*/
+/*dxbl-grid .dxbl-grid-table .dxbl-grid-data-row:hover {
+    background-color: #ff0000 !important;*/  /*Your desired hover color (e.g., red)*/
+    /*--dxbl-grid-bg: #ff0000 !important;*/  /*Required for themes that use CSS variables for background*/ 
+    /*cursor: pointer;*/  /*Optional: changes cursor to pointer on hover */
+/*}*/
 .status-no-issues {
     background-color: green;
     /*font-weight: bold;*/

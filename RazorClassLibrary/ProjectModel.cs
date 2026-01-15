@@ -9,8 +9,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-
-
 namespace RazorClassLibrary
 {
     public class ProjectModel : BindableBase
@@ -18,8 +16,10 @@ namespace RazorClassLibrary
         public int ID { get; set; }
         public string Status { get; set; }
         public string DepartmentPriority { get; set; }
+        [Required]
         public string Site { get; set; }
         public double ProjectROI { get; set; }
+        [Required]
         public string Department { get; set; }
         //private string _project;
 
@@ -43,9 +43,13 @@ namespace RazorClassLibrary
                 }
             }
         }
+        [Required]
         public string ProjectType { get; set; }
+        [Required]
         public string ProjectOwner { get; set; }
+        [Required]
         public string PrincipalIT { get; set; }
+        public string EPlant { get; set; }
         public string BusinessOwner { get; set; }
         public int TicketNumber { get; set; }
         public DateTime? StartDate { get; set; }

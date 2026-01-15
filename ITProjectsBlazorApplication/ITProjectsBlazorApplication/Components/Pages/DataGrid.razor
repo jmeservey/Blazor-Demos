@@ -8,7 +8,8 @@
 <h3>Projects</h3>
 
 <div class="grid-container">
-
+    @* NOTES: *@
+    @* There is no ability within this grid to capture the column of a selected cell. *@
 <DxGrid 
     Data="@Data" 
     EditMode="GridEditMode.EditRow" 
@@ -18,13 +19,14 @@
     PagerAutoHideNavButtons="false" 
     PageSizeSelectorVisible="true" 
     SizeMode="SizeMode.Small" 
-    HighlightRowOnHover="true"
+    FocusedRowEnabled="true"
     FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Never"
     EditModelSaving="Grid_EditModelSaving"
     DataItemDeleting="Grid_DataItemDeleting"
     EditNewRowPosition="GridEditNewRowPosition.FixedOnTop"
     CustomizeElement="Grid_CustomizeElement"
-    CssClass="grid-size">
+    KeyFieldName="ID"
+    CssClass="project-grid">
 
     <Columns>
         <DxGridCommandColumn Width="125px" FixedPosition="GridColumnFixedPosition.Left"/>
@@ -73,8 +75,6 @@
                 <DxComboBoxSettings Data="ProjectStageOptions" />
                 </EditSettings>
         </DxGridDataColumn>       
-        <DxGridDataColumn FieldName="Department" Width="100px"/>
-        <DxGridDataColumn FieldName="BusinessOwner" Width="150px" />
         <DxGridDataColumn FieldName="TicketNumber" DisplayFormat="{0:g}" TextAlignment="GridTextAlignment.Center" Width="50px">
             <CellDisplayTemplate>
                 @* Custom display for TicketNumber to show a link if it is not empty *@
@@ -98,34 +98,18 @@
                 }
             </CellDisplayTemplate>
         </DxGridDataColumn>
-        <DxGridDataColumn FieldName="StartDate" DisplayFormat="d" TextAlignment="GridTextAlignment.Center" Width="75px" />
-        <DxGridDataColumn FieldName="ProjectedEndDate" DisplayFormat="d" TextAlignment="GridTextAlignment.Center" Width="75px" />
         <DxGridDataColumn FieldName="Stakeholders" Width="75px" />
         <DxGridDataColumn FieldName="Scope" Width="150px" />
-        <DxGridDataColumn FieldName="ProjectStage" Width="75px" />
         <DxGridDataColumn FieldName="PercentComplete" DisplayFormat="p0" TextAlignment="GridTextAlignment.Center" Width="75px">
             <EditSettings>
                 <DxComboBoxSettings Data="PercentCompleteOptions" />
-                </EditSettings>
+            </EditSettings>
         </DxGridDataColumn>
         <DxGridDataColumn FieldName="ProjectROI" DisplayFormat="c0" TextAlignment="GridTextAlignment.Center" Width="75px" />
-        <DxGridDataColumn FieldName="Notes" Width="150px">
-                <CellDisplayTemplate>
-                    @* Custom display for Notes to show a link if it is not empty *@
-                    @{
-                        var value = ((ProjectModel)context.DataItem).Notes.ToString();
-                        if (!string.IsNullOrEmpty(value))
-                        {
-                            <a class="d-block text-left" href="javascript:;" @onclick="() => ShowNote(context)">Show Note...</a>
-                        }
-                        else
-                        {
-                            <span></span>
-                        }
-                    }
-                </CellDisplayTemplate>
+        <DxGridDataColumn FieldName="Notes" Width="210px">
+
              <EditSettings>
-                <DxMemoSettings Rows="3"  ResizeMode="MemoResizeMode.VerticalAndHorizontal"/>
+                <DxMemoSettings Rows="10"  ResizeMode="MemoResizeMode.VerticalAndHorizontal"/>
             </EditSettings> 
         </DxGridDataColumn>
     </Columns>
@@ -163,21 +147,30 @@
         ITStaffOptions.Clear();
         ITStaffOptions.AddRange(agentInfo.Select(x => x.FullName));
     }
-    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
+    void Grid_EditModelSaving(GridEditModelSavingEventArgs e)
     {
-        var editableProject = (ProjectModel)e.EditModel;
-
-        if (e.IsNew)
+        try
         {
-            Database.CreateProject(editableProject);
-        }
-        else
-        {
-            // TODO: Need either have this work with an update that updates all the data or just one data row at a time.
-            // Database.UpdateProject(editableProject);
-        }
+            var editableProject = (ProjectModel)e.EditModel;
 
-        Data = Database.GetProjects();
+            if (e.IsNew)
+            {
+                Console.WriteLine("Create.");
+                Database.CreateProject(editableProject);
+            }
+            else
+            {
+                // TODO: Need either have this work with an update that updates all the data or just one data row at a time.
+                Console.WriteLine("Update.");
+                Database.UpdateProject(editableProject);
+            }
+
+            Data = Database.GetProjects();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
     }
 
     async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
@@ -189,46 +182,46 @@
 
     void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
     {
-        if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
+        if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1 && !e.Grid.IsRowFocused(e.VisibleIndex))
         {
-            e.CssClass = "alt-item";
+            e.CssClass = "alt-row";
         }
 
         if (e.ElementType == GridElementType.DataCell) // && e.Column.Name == "Status") //&& (System.String)e.Grid.GetRowValue(e.VisibleIndex, "Status") == "No Issues")
         {
             if (e.Column.Name == "StatusCol")
             {
-                switch ((System.String)e.Grid.GetRowValue(e.VisibleIndex, "Status"))
-                {
-                    case "Critical Issues":
-                        e.CssClass = "status-critical-issues";
-                        break;
-                    case "Delays":
-                        e.CssClass = "status-delays";
-                        break;
-                    case "On Hold":
-                        e.CssClass = "status-on-hold";
-                        break;
-                    case "Completed":
-                        e.CssClass = "status-completed";
-                        break;
-                    case "Cancelled":
-                        e.CssClass = "status-cancelled";
-                        break;
-                    case "No Issues":
-                        e.CssClass = "status-no-issues";
-                        break;
-                    default:
-                        //e.CssClass = string.Empty;
-                        break;
-                }
+                    switch ((System.String)e.Grid.GetRowValue(e.VisibleIndex, "Status"))
+                    {                        
+                        case "Critical Issues":
+                            e.CssClass += "status-critical-issues";
+                            break;
+                        case "Delays":
+                            e.CssClass += "status-delays";
+                            break;
+                        case "On Hold":
+                            e.CssClass += "status-on-hold";
+                            break;
+                        case "Completed":
+                            e.CssClass += "status-completed";
+                            break;
+                        case "Cancelled":
+                            e.CssClass += "status-cancelled";
+                            break;
+                        case "No Issues":
+                            e.CssClass += "status-no-issues";
+                            break;
+                        default:
+                            //e.CssClass = string.Empty;
+                            break;
+                    }                
             }
         }
 
         if (e.ElementType == GridElementType.HeaderCell)
         {
-            e.Style = "background-color: #E6E6E6;";
-            e.CssClass = "header-bold";
+            // e.Style = "background-color: #E6E6E6;";
+            e.CssClass += "header-row";
         }
     }
     bool PopupVisible
