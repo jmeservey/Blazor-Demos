@@ -6,7 +6,8 @@
 <PageTitle>Projects</PageTitle>
 
 <h3>Projects</h3>
-
+<ErrorBoundary @ref="errorBoundary">
+    <ChildContent>
 <div class="grid-container">
     @* NOTES: *@
     @* There is no ability within this grid to capture the column of a selected cell. *@
@@ -123,6 +124,11 @@
          </Content>
 </DxPopup>
 </div>
+    </ChildContent>
+    <ErrorContent>
+        <p>Something went wrong.</p>
+    </ErrorContent>
+</ErrorBoundary>
 @code {
     IEnumerable<ProjectModel> Data { get; set; }
     List<string> StatusOptions = new List<string>() { "No Issues", "On Hold", "Delays", "Critical Issues", "Completed", "Cancelled" };
@@ -156,11 +162,14 @@
             if (e.IsNew)
             {
                 Console.WriteLine("Create.");
+                // Errors thrown by this method are not being caught by this try catch.
                 Database.CreateProject(editableProject);
             }
             else
             {
                 // TODO: Need either have this work with an update that updates all the data or just one data row at a time.
+                // There isn't an event listener that captures what column is selected when a cell's value is changed.  So we
+                // have to update the entire row when cell value changes.
                 Console.WriteLine("Update.");
                 Database.UpdateProject(editableProject);
             }
@@ -169,6 +178,7 @@
         }
         catch (Exception ex)
         {
+            // throw new Exception(ex.Message);  This causes the app to lose connection.  But the full exception message shows up in the output window.
             Console.WriteLine(ex.Message);
         }
     }
@@ -191,30 +201,30 @@
         {
             if (e.Column.Name == "StatusCol")
             {
-                    switch ((System.String)e.Grid.GetRowValue(e.VisibleIndex, "Status"))
-                    {                        
-                        case "Critical Issues":
-                            e.CssClass += "status-critical-issues";
-                            break;
-                        case "Delays":
-                            e.CssClass += "status-delays";
-                            break;
-                        case "On Hold":
-                            e.CssClass += "status-on-hold";
-                            break;
-                        case "Completed":
-                            e.CssClass += "status-completed";
-                            break;
-                        case "Cancelled":
-                            e.CssClass += "status-cancelled";
-                            break;
-                        case "No Issues":
-                            e.CssClass += "status-no-issues";
-                            break;
-                        default:
-                            //e.CssClass = string.Empty;
-                            break;
-                    }                
+                switch ((System.String)e.Grid.GetRowValue(e.VisibleIndex, "Status"))
+                {                        
+                    case "Critical Issues":
+                        e.CssClass += "status-critical-issues";
+                        break;
+                    case "Delays":
+                        e.CssClass += "status-delays";
+                        break;
+                    case "On Hold":
+                        e.CssClass += "status-on-hold";
+                        break;
+                    case "Completed":
+                        e.CssClass += "status-completed";
+                        break;
+                    case "Cancelled":
+                        e.CssClass += "status-cancelled";
+                        break;
+                    case "No Issues":
+                        e.CssClass += "status-no-issues";
+                        break;
+                    default:
+                        //e.CssClass = string.Empty;
+                        break;
+                }                
             }
         }
 
@@ -246,5 +256,12 @@
     public void ShowNote(GridDataColumnCellDisplayTemplateContext context)
     {
         CurrentProject = (ProjectModel)context.DataItem;
+    }
+
+    ErrorBoundary errorBoundary;
+
+    private void Recover()
+    {
+        errorBoundary?.Recover();
     }
 }

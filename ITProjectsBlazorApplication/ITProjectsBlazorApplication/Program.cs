@@ -1,6 +1,6 @@
 using ITProjectsBlazorApplication.Components;
 using ITProjectsBlazorApplication.Services;
-using ITProjectsBlazorApplication.Client.Pages;
+//using ITProjectsBlazorApplication.Client.Pages;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,7 +34,7 @@ app.UseAntiforgery();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode()
-    .AddAdditionalAssemblies(typeof(Counter).Assembly)
+    //.AddAdditionalAssemblies(typeof(Counter).Assembly)
     .AllowAnonymous();
 
 

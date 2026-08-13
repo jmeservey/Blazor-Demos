@@ -16,8 +16,8 @@ namespace RazorClassLibrary
 
         public static void CreateProject(ProjectModel project)
         {
-            try
-            {
+            //try
+            //{
                 using (IDbConnection connection = new SqlConnection(ConnectionString))
                 {
                     string queryString = $"INSERT INTO Projects (Status, DepartmentPriority, Site, ProjectROI, Department, Project, ProjectType, ProjectOwner, PrincipalIT, BusinessOwner, TicketNumber, StartDate, ProjectedEndDate, Stakeholders, Scope, ProjectStage, PercentComplete, Notes, ProjectFolderPath)" +
@@ -29,11 +29,12 @@ namespace RazorClassLibrary
 
                     project.ID = int.Parse(connection.ExecuteScalar("SELECT @@IDENTITY").ToString());
                 }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
+            //}
+            //catch (Exception ex)
+            //{
+            //    // The error gets caught but nothing gets sent to the user.  It just silently fails.
+            //    Console.WriteLine(ex.Message);
+            //}
         }
         public static List<ProjectModel> GetSampleProjects()
         {

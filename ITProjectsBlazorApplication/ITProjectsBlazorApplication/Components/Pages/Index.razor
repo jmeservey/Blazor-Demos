@@ -36,6 +36,15 @@
     </DxGridLayout>
 </div>
 
+<ErrorBoundary>
+        <ChildContent>
+        <DataGrid />
+    </ChildContent>
+    <ErrorContent>
+        <p class="errorUI">😈 A rotten gremlin got us. Sorry!</p>
+    </ErrorContent>
+</ErrorBoundary>
+
 @code {
     [SupplyParameterFromQuery(Name = UrlGenerator.ToggleSidebarName)]
     public bool ToggledSidebar { get; set; }
