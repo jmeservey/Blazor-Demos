@@ -1,4 +1,5 @@
-﻿using DevExpress.Mvvm;
+﻿using CommunityToolkit.Mvvm;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,7 +12,7 @@ using System.Windows;
 
 namespace RazorClassLibrary
 {
-    public class ProjectModel : BindableBase
+    public class ProjectModel : ObservableObject
     {
         public int ID { get; set; }
         public string Status { get; set; }
@@ -63,7 +64,7 @@ namespace RazorClassLibrary
         public string ProjectROIFilePath { get; set; } = "";
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        protected void OnPropertyChanged([CallerMemberName] string name = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
